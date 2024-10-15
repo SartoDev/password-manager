@@ -71,7 +71,7 @@ export default function RootLayout() {
           name='index'
           options={{
             title: 'teste',
-            header: () => <></>,
+            headerRight: () => <ThemeToggle/>,
           }}
         />
       </Stack>
