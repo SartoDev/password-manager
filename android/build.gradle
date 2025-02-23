@@ -1,0 +1,24 @@
+ext {
+    ndkVersion = '27.0.12077973'
+    compileSdkVersion = 33
+    compileSdkVersion1 = compileSdkVersion
+    ndkVersion1 = ndkVersion
+}
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = "../build"
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(":app")
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
