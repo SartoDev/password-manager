@@ -162,82 +162,84 @@ class _HomeScreenState extends State<HomeScreen> {
                         showDeleteCredential = credentialList
                             .any((credential) => credential.selected == true);
                       }),
-                      child: ExpansionTile(
-                          enabled: !showDeleteCredential,
-                          title: Text(credential.platform.label),
-                          leading: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (showDeleteCredential)
-                                Checkbox(
-                                    value: credential.selected,
-                                    onChanged: (value) => setState(() {
-                                          credential.selected = value!;
-                                          if (credential.selected) {
-                                            deleteCredentialList
-                                                .add(credential);
-                                          } else {
-                                            deleteCredentialList
-                                                .remove(credential);
-                                          }
-                                          showDeleteCredential =
-                                              credentialList.any((credential) =>
-                                                  credential.selected == true);
-                                        })),
-                              Container(
-                                  width: 30,
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                          image: AssetImage(
-                                              credential.platform.image))))
-                            ],
-                          ),
+                      child: ListTile(
+                        title: Text(credential.login),
+                        subtitle: Text(credential.showPassword
+                            ? credential.password
+                            : ("*") * credential.password.length),
+                        leading: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            ListTile(
-                              title: Text(credential.login),
-                              subtitle: Text(credential.password),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                      onPressed: () =>
-                                          _updateDialog(context, credential),
-                                      icon: Icon(Icons.edit)),
-                                  IconButton(
-                                      onPressed: () {
-                                        Clipboard.setData(ClipboardData(
-                                            text: credential.password));
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(SnackBar(
-                                                content: Text(
-                                                    "Senha copiada para a área de transferência!"),
-                                                backgroundColor: Colors.green));
-                                      },
-                                      icon: Icon(Icons.copy)),
-                                  IconButton(
-                                      onPressed: () async {
-                                        await CredentialStorage
-                                            .deleteCredential(credential.id!);
-                                        ScaffoldMessenger.of(context)
-                                            .hideCurrentSnackBar();
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(SnackBar(
-                                                content: Text(
-                                                    "Credencial removida com sucesso!"),
-                                                backgroundColor: Colors.green));
-                                        setState(() {
-                                          _futureCredentialList =
-                                              CredentialStorage
-                                                  .getCredentials();
-                                        });
-                                      },
-                                      icon: Icon(Icons.delete,
-                                          color: Colors.red)),
-                                ],
-                              ),
-                            )
-                          ]),
+                            if (showDeleteCredential)
+                              Checkbox(
+                                  value: credential.selected,
+                                  onChanged: (value) => setState(() {
+                                        credential.selected = value!;
+                                        if (credential.selected) {
+                                          deleteCredentialList.add(credential);
+                                        } else {
+                                          deleteCredentialList
+                                              .remove(credential);
+                                        }
+                                        showDeleteCredential =
+                                            credentialList.any((credential) =>
+                                                credential.selected == true);
+                                      })),
+                            Container(
+                                width: 30,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        image: AssetImage(
+                                            credential.platform.image))))
+                          ],
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                                onPressed: () => setState(() {
+                                      credential.showPassword =
+                                          !credential.showPassword;
+                                    }),
+                                icon: credential.showPassword
+                                    ? Icon(Icons.visibility_off)
+                                    : Icon(Icons.visibility)),
+                            IconButton(
+                                onPressed: () =>
+                                    _updateDialog(context, credential),
+                                icon: Icon(Icons.edit)),
+                            IconButton(
+                                onPressed: () {
+                                  Clipboard.setData(
+                                      ClipboardData(text: credential.password));
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              "Senha copiada para a área de transferência!"),
+                                          backgroundColor: Colors.green));
+                                },
+                                icon: Icon(Icons.copy)),
+                            IconButton(
+                                onPressed: () async {
+                                  await CredentialStorage.deleteCredential(
+                                      credential.id!);
+                                  ScaffoldMessenger.of(context)
+                                      .hideCurrentSnackBar();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              "Credencial removida com sucesso!"),
+                                          backgroundColor: Colors.green));
+                                  setState(() {
+                                    _futureCredentialList =
+                                        CredentialStorage.getCredentials();
+                                  });
+                                },
+                                icon: Icon(Icons.delete, color: Colors.red)),
+                          ],
+                        ),
+                      ),
                     );
                   },
                 );
