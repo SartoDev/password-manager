@@ -57,4 +57,13 @@ class CredentialStorage {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_key);
   }
+
+  static Future<List<Credential>> findByLogin(String login) async {
+    final prefs = await SharedPreferences.getInstance();
+    String? encodedList = prefs.getString(_key);
+    if (encodedList == null) return [];
+
+    List<dynamic> decoded = jsonDecode(encodedList);
+    return decoded.map((item) => Credential.fromJson(item)).where((c) => c.login.toLowerCase().contains(login.toLowerCase())).toList();
+  }
 }

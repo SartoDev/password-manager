@@ -47,6 +47,7 @@ class Credential {
   final String password;
   final CredentialPlatform platform;
   var selected = false;
+  var showPassword = false;
 
   Credential(
       {this.id, required this.login, required this.password, required this.platform});
