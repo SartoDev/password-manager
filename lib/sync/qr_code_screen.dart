@@ -53,11 +53,17 @@ class _CameraScreenState extends State<QrCodeScreen> {
 
   void startServer() async {
     var handler =
-        webSocketHandler((WebSocketChannel channel, String? protocol) {
+    webSocketHandler((WebSocketChannel channel, String? protocol) {
       connectedChannel = channel;
       channel.stream.listen((message) async {
         final credentialList = jsonDecode(message);
+        final actualCredentialList = await CredentialStorage.getCredentials();
         for (final credential in credentialList) {
+          final foundCredential = actualCredentialList.where(
+                  (element) => element.id == credential["id"]);
+          if (foundCredential.isNotEmpty) {
+            continue;
+          }
           await CredentialStorage.addCredential(
               Credential.fromJson(credential));
         }
@@ -96,37 +102,38 @@ class _CameraScreenState extends State<QrCodeScreen> {
         child: qrData == null && syncCode == null
             ? CircularProgressIndicator()
             : Column(
-                spacing: 10,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  QrImageView(data: qrData!, size: 200),
-                  Container(
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black54),
-                          borderRadius: BorderRadius.circular(3)),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text("Código de sincronização: ${syncCode!}"),
-                          IconButton(
-                              icon: Icon(Icons.copy),
-                              onPressed: () {
-                                Clipboard.setData(
-                                    ClipboardData(text: syncCode!));
-                                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                    content: Text(
-                                        "Código copiado para a área de transferência!"),
-                                    backgroundColor: Colors.green));
-                              })
-                        ],
-                      )),
-                  Text(
-                      "Escaneie o QR Code ou envie o código de sincronização para compartilhar suas credenciais!",
-                      textAlign: TextAlign.center),
-                ],
-              ),
+          spacing: 10,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            QrImageView(data: qrData!, size: 200),
+            Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black54),
+                    borderRadius: BorderRadius.circular(3)),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text("Código de sincronização: ${syncCode!}"),
+                    IconButton(
+                        icon: Icon(Icons.copy),
+                        onPressed: () {
+                          Clipboard.setData(
+                              ClipboardData(text: syncCode!));
+                          ScaffoldMessenger.of(context)
+                              .hideCurrentSnackBar();
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(
+                                  "Código copiado para a área de transferência!"),
+                              backgroundColor: Colors.green));
+                        })
+                  ],
+                )),
+            Text(
+                "Escaneie o QR Code ou envie o código de sincronização para compartilhar suas credenciais!",
+                textAlign: TextAlign.center),
+          ],
+        ),
       ),
     );
   }
