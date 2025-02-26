@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -80,19 +81,19 @@ class _HomeScreenState extends State<HomeScreen> {
         appBar: AppBar(
           title: showSearchField
               ? TextField(
-                  onChanged: (value) {
-                    _findByLogin(value);
-                  },
-                  decoration:
-                      InputDecoration(hintText: "Busque por uma credencial..."),
-                )
+            onChanged: (value) {
+              _findByLogin(value);
+            },
+            decoration:
+            InputDecoration(hintText: "Busque por uma credencial..."),
+          )
               : Text("Senhas"),
           centerTitle: true,
           actions: [
             IconButton(
                 onPressed: () => setState(() {
-                      showSearchField = !showSearchField;
-                    }),
+                  showSearchField = !showSearchField;
+                }),
                 icon: Icon(showSearchField ? Icons.close : Icons.search)),
             if (showDeleteCredential)
               IconButton(
@@ -119,14 +120,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             TextButton(
                               style: TextButton.styleFrom(
                                   textStyle:
-                                      Theme.of(context).textTheme.labelLarge),
+                                  Theme.of(context).textTheme.labelLarge),
                               child: const Text("Não"),
                               onPressed: () => Navigator.of(context).pop(false),
                             ),
                             TextButton(
                               style: TextButton.styleFrom(
                                   textStyle:
-                                      Theme.of(context).textTheme.labelLarge),
+                                  Theme.of(context).textTheme.labelLarge),
                               child: const Text("Sim"),
                               onPressed: () => Navigator.of(context).pop(true),
                             ),
@@ -173,6 +174,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             .any((credential) => credential.selected == true);
                       }),
                       onTap: () => setState(() {
+                        if(!showDeleteCredential) {
+                          return;
+                        }
                         credential.selected = !credential.selected;
                         if (credential.selected) {
                           deleteCredentialList.add(credential);
@@ -194,17 +198,17 @@ class _HomeScreenState extends State<HomeScreen> {
                               Checkbox(
                                   value: credential.selected,
                                   onChanged: (value) => setState(() {
-                                        credential.selected = value!;
-                                        if (credential.selected) {
-                                          deleteCredentialList.add(credential);
-                                        } else {
-                                          deleteCredentialList
-                                              .remove(credential);
-                                        }
-                                        showDeleteCredential =
-                                            credentialList.any((credential) =>
-                                                credential.selected == true);
-                                      })),
+                                    credential.selected = value!;
+                                    if (credential.selected) {
+                                      deleteCredentialList.add(credential);
+                                    } else {
+                                      deleteCredentialList
+                                          .remove(credential);
+                                    }
+                                    showDeleteCredential =
+                                        credentialList.any((credential) =>
+                                        credential.selected == true);
+                                  })),
                             Container(
                                 width: 30,
                                 height: 30,
@@ -217,46 +221,91 @@ class _HomeScreenState extends State<HomeScreen> {
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            IconButton(
-                                onPressed: () => setState(() {
+                            if (Platform.isWindows) ...[
+                              IconButton(
+                                  onPressed: () => setState(() {
+                                    credential.showPassword =
+                                    !credential.showPassword;
+                                  }),
+                                  icon: credential.showPassword
+                                      ? Icon(Icons.visibility_off)
+                                      : Icon(Icons.visibility)),
+                              IconButton(
+                                  onPressed: () {
+                                    Clipboard.setData(ClipboardData(
+                                        text: credential.password));
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                "Senha copiada para a área de transferência!"),
+                                            backgroundColor: Colors.green));
+                                  },
+                                  icon: Icon(Icons.copy)),
+                              IconButton(
+                                  onPressed: () =>
+                                      _updateDialog(context, credential),
+                                  icon: Icon(Icons.edit)),
+                              IconButton(
+                                  onPressed: () async {
+                                    await CredentialStorage.deleteCredential(
+                                        credential.id!);
+                                    ScaffoldMessenger.of(context)
+                                        .hideCurrentSnackBar();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                "Credencial removida com sucesso!"),
+                                            backgroundColor: Colors.green));
+                                    setState(() {
+                                      _futureCredentialList =
+                                          CredentialStorage.getCredentials();
+                                    });
+                                  },
+                                  icon: Icon(Icons.delete, color: Colors.red)),
+                            ],
+                            if (Platform.isAndroid)
+                              MenuAnchor(
+                                builder: (BuildContext context,
+                                    MenuController controller, Widget? child) {
+                                  return IconButton(
+                                    onPressed: () {
+                                      if (controller.isOpen) {
+                                        controller.close();
+                                      } else {
+                                        controller.open();
+                                      }
+                                    },
+                                    icon: const Icon(Icons.more_vert),
+                                    tooltip: 'Show menu',
+                                  );
+                                },
+                                menuChildren: [
+                                  MenuItemButton(
+                                    onPressed: () => setState(() {
                                       credential.showPassword =
-                                          !credential.showPassword;
+                                      !credential.showPassword;
                                     }),
-                                icon: credential.showPassword
-                                    ? Icon(Icons.visibility_off)
-                                    : Icon(Icons.visibility)),
-                            IconButton(
-                                onPressed: () =>
-                                    _updateDialog(context, credential),
-                                icon: Icon(Icons.edit)),
-                            IconButton(
-                                onPressed: () {
-                                  Clipboard.setData(
-                                      ClipboardData(text: credential.password));
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content: Text(
-                                              "Senha copiada para a área de transferência!"),
-                                          backgroundColor: Colors.green));
-                                },
-                                icon: Icon(Icons.copy)),
-                            IconButton(
-                                onPressed: () async {
-                                  await CredentialStorage.deleteCredential(
-                                      credential.id!);
-                                  ScaffoldMessenger.of(context)
-                                      .hideCurrentSnackBar();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content: Text(
-                                              "Credencial removida com sucesso!"),
-                                          backgroundColor: Colors.green));
-                                  setState(() {
-                                    _futureCredentialList =
-                                        CredentialStorage.getCredentials();
-                                  });
-                                },
-                                icon: Icon(Icons.delete, color: Colors.red)),
+                                    child: Text(credential.showPassword ? "Esconder Senha" : "Visualizar Senha"),
+                                  ),
+                                  MenuItemButton(
+                                    onPressed: () {
+                                      Clipboard.setData(ClipboardData(
+                                          text: credential.password));
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                              content: Text(
+                                                  "Senha copiada para a área de transferência!"),
+                                              backgroundColor: Colors.green));
+                                    },
+                                    child: Text('Copiar Senha'),
+                                  ),
+                                  MenuItemButton(
+                                    onPressed: () =>
+                                        _updateDialog(context, credential),
+                                    child: Text('Editar Credencial'),
+                                  )
+                                ],
+                              ),
                           ],
                         ),
                       ),
