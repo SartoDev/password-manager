@@ -57,7 +57,13 @@ class _CameraScreenState extends State<QrCodeScreen> {
       connectedChannel = channel;
       channel.stream.listen((message) async {
         final credentialList = jsonDecode(message);
+        final actualCredentialList = await CredentialStorage.getCredentials();
         for (final credential in credentialList) {
+          final foundCredential = actualCredentialList.where(
+              (element) => element.id == credential["id"]);
+          if (foundCredential.isNotEmpty) {
+            continue;
+          }
           await CredentialStorage.addCredential(
               Credential.fromJson(credential));
         }
@@ -114,7 +120,8 @@ class _CameraScreenState extends State<QrCodeScreen> {
                               onPressed: () {
                                 Clipboard.setData(
                                     ClipboardData(text: syncCode!));
-                                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                ScaffoldMessenger.of(context)
+                                    .hideCurrentSnackBar();
                                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                     content: Text(
                                         "Código copiado para a área de transferência!"),
