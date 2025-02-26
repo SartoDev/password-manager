@@ -16,6 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
   var showDeleteCredential = false;
   var deleteCredentialList = [];
   late Future<List<Credential>> _futureCredentialList;
+  var showSearchField = false;
 
   @override
   void initState() {
@@ -26,6 +27,12 @@ class _HomeScreenState extends State<HomeScreen> {
   _updateCredentialList() {
     setState(() {
       _futureCredentialList = CredentialStorage.getCredentials();
+    });
+  }
+
+  _findByLogin(String login) {
+    setState(() {
+      _futureCredentialList = CredentialStorage.findByLogin(login);
     });
   }
 
@@ -71,9 +78,22 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         appBar: AppBar(
-          title: Text("Senhas"),
+          title: showSearchField
+              ? TextField(
+                  onChanged: (value) {
+                    _findByLogin(value);
+                  },
+                  decoration:
+                      InputDecoration(hintText: "Busque por uma credencial..."),
+                )
+              : Text("Senhas"),
           centerTitle: true,
           actions: [
+            IconButton(
+                onPressed: () => setState(() {
+                      showSearchField = !showSearchField;
+                    }),
+                icon: Icon(showSearchField ? Icons.close : Icons.search)),
             if (showDeleteCredential)
               IconButton(
                   icon: Icon(Icons.close),
