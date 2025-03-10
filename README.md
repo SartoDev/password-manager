@@ -1,16 +1,32 @@
-# password_manager
+<p align="center" dir="auto">
+<img src="https://raw.githubusercontent.com/SartoDev/password-manager/refs/heads/other-logo/assets/images/logo.png" width=120>
+</p>
 
-Flutter app to storage all passwords of my own
+<p align="center" dir="auto">
+Aplicação desktop e Android em <a href="https://flutter.dev" rel="nofollow">Flutter</a> para organizar senhas localmente. A aplicação permite armazenar, gerenciar e acessar suas senhas de maneira segura e eficiente em dispositivos desktop e móveis.
+</p>
 
-## Getting Started
+![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/sarto_leonardo)
+![GitHub stars](https://img.shields.io/github/stars/SartoDev/password-manager?style=social)
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+## Instalação
+1. Clone este repositório:
+   ```bash
+   $ git clone https://github.com/SartoDev/password-manager.git
+   ```
+2. Acesse a pasta do projeto:
+   ```bash
+   $ cd code_snippets
+   ```
+3. Instale as dependências:
+   ```bash
+   $ flutter pub get
+   ```
+4. Inicie a aplicação:
+   ```bash
+   $ flutter run
+   ```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Licença
+Este projeto está sob a licença <a href="https://github.com/SartoDev/password-manager/blob/main/LICENSE" rel="nofollow">MIT</a>. Sinta-se à vontade para contribuir! 🚀
