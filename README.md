@@ -17,7 +17,7 @@ Aplicação desktop e Android em <a href="https://flutter.dev" rel="nofollow">Fl
    ```
 2. Acesse a pasta do projeto:
    ```bash
-   $ cd code_snippets
+   $ cd password-manager
    ```
 3. Instale as dependências:
    ```bash
